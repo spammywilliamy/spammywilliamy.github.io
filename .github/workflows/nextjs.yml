@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Song Rating Card Generator</title>
+  <title>Song Rating Suite & Card Generator</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     :root {
@@ -26,41 +26,49 @@
       color: var(--text);
       min-height: 100vh;
       margin: 0;
-      padding: 2rem 1rem;
+      padding: 2.5rem 1rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1.5rem;
+      gap: 2rem;
     }
 
-    /* Input Controls Section */
-    .controls-panel {
-      max-width: 600px;
+    .main-container {
+      max-width: 900px;
       width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .panel {
       background: rgba(22, 31, 49, 0.8);
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
-      padding: 1.5rem;
+      padding: 1.75rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 1.25rem;
     }
 
-    .form-group {
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 0.75rem;
       display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    label {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-weight: 600;
-    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; }
 
-    input {
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+    
+    input, textarea {
       background: var(--input-bg);
       border: 1px solid var(--card-border);
       color: var(--text);
@@ -70,71 +78,56 @@
       width: 100%;
     }
 
-    input:focus {
-      outline: 2px solid var(--accent);
-    }
+    textarea { height: 90px; resize: vertical; font-family: inherit; }
+    input:focus, textarea:focus { outline: 2px solid var(--accent); }
 
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-    }
-
-    .grid-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 0.75rem;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 0.75rem;
-      margin-top: 0.5rem;
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; }
+    th, td { padding: 0.6rem; text-align: left; border-bottom: 1px solid var(--card-border); }
+    th { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; }
 
     .btn {
       background: var(--accent);
       color: white;
       border: none;
-      padding: 0.75rem 1.25rem;
+      padding: 0.65rem 1.2rem;
       border-radius: 8px;
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.95rem;
-      flex: 1;
+      font-size: 0.9rem;
       transition: background 0.2s;
     }
-
     .btn:hover { background: var(--accent-hover); }
 
-    .btn-export {
-      background: #10b981;
-    }
-
+    .btn-export { background: #10b981; }
     .btn-export:hover { background: #059669; }
 
-    /* Clean Card Layout for Image Capture */
+    .btn-danger { background: transparent; border: none; color: #ef4444; cursor: pointer; font-size: 1.1rem; }
+
+    /* CARD PREVIEW DESIGN (Only this captures in image) */
+    .card-preview-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
     .card-preview {
-      width: 480px;
+      width: 440px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: var(--radius);
-      padding: 2rem;
+      padding: 1.75rem;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .card-header {
-      display: flex;
       gap: 1.25rem;
-      align-items: center;
     }
 
+    .card-header { display: flex; gap: 1.25rem; align-items: center; }
+    
     .album-cover {
-      width: 110px;
-      height: 110px;
+      width: 100px;
+      height: 100px;
       border-radius: 12px;
       object-fit: cover;
       background: var(--input-bg);
@@ -142,183 +135,172 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
 
-    .song-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      overflow: hidden;
-    }
+    .song-meta { display: flex; flex-direction: column; gap: 0.25rem; overflow: hidden; }
+    .song-title { font-size: 1.4rem; font-weight: 800; margin: 0; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .artist-name { font-size: 1.05rem; color: var(--accent); font-weight: 600; margin: 0; }
+    .album-name { font-size: 0.85rem; color: var(--text-muted); margin: 0; }
 
-    .song-title {
-      font-size: 1.5rem;
-      font-weight: 800;
-      margin: 0;
-      color: #fff;
-      line-height: 1.2;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .artist-name {
-      font-size: 1.1rem;
-      color: var(--accent);
-      font-weight: 600;
-      margin: 0;
-    }
-
-    .album-name {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin: 0;
-    }
-
-    /* Total Ranking Display */
     .ranking-box {
       background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
       border-radius: 12px;
-      padding: 1.25rem;
+      padding: 1rem;
       text-align: center;
       box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
     }
 
-    .ranking-label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      opacity: 0.85;
-      margin-bottom: 0.25rem;
-    }
+    .ranking-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.85; margin-bottom: 0.2rem; }
+    .ranking-score { font-size: 3.25rem; font-weight: 900; line-height: 1; }
 
-    .ranking-score {
-      font-size: 3.5rem;
-      font-weight: 900;
-      line-height: 1;
-    }
-
-    /* Sub-categories List */
-    .subcategories-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
+    .subcategories-list { display: flex; flex-direction: column; gap: 0.6rem; }
     .sub-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: rgba(15, 23, 42, 0.6);
       border: 1px solid var(--card-border);
-      padding: 0.6rem 0.9rem;
+      padding: 0.55rem 0.85rem;
       border-radius: 8px;
     }
-
-    .sub-name {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .sub-value {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #a5b4fc;
-    }
+    .sub-name { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+    .sub-value { font-size: 1rem; font-weight: 700; color: #a5b4fc; }
   </style>
 </head>
 <body>
 
-  <!-- Input Panel -->
-  <div class="controls-panel">
-    <div class="grid-2">
-      <div class="form-group">
-        <label>Song Title</label>
-        <input type="text" id="inTitle" value="Style" oninput="updateCard()" />
+  <div class="main-container">
+    
+    <!-- 1. Song Info & Media Cover Fetch -->
+    <div class="panel">
+      <h2>Song Information</h2>
+      <div class="grid-3">
+        <div class="form-group">
+          <label>Song Title</label>
+          <input type="text" id="inTitle" value="Style" oninput="updateCard()" />
+        </div>
+        <div class="form-group">
+          <label>Artist Name</label>
+          <input type="text" id="inArtist" value="Taylor Swift" oninput="updateCard()" />
+        </div>
+        <div class="form-group">
+          <label>Album Name</label>
+          <input type="text" id="inAlbum" value="1989" oninput="updateCard()" />
+        </div>
       </div>
-      <div class="form-group">
-        <label>Artist</label>
-        <input type="text" id="inArtist" value="Taylor Swift" oninput="updateCard()" />
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label>Album</label>
-      <input type="text" id="inAlbum" value="1989" oninput="updateCard()" />
-    </div>
-
-    <div class="btn-row">
-      <button class="btn" onclick="fetchCover()">🔍 Fetch Album Cover</button>
-    </div>
-
-    <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 0.5rem 0;" />
-
-    <div class="grid-3">
-      <div class="form-group">
-        <label>Lyrics (1-10)</label>
-        <input type="number" id="inLyrics" value="8.7" step="0.1" min="1" max="10" oninput="calculate()" />
-      </div>
-      <div class="form-group">
-        <label>Production (1-10)</label>
-        <input type="number" id="inProd" value="9.4" step="0.1" min="1" max="10" oninput="calculate()" />
-      </div>
-      <div class="form-group">
-        <label>Melody (1-10)</label>
-        <input type="number" id="inMelody" value="7.8" step="0.1" min="1" max="10" oninput="calculate()" />
+      <div>
+        <button class="btn" onclick="fetchCover()">🔍 Fetch Album Cover</button>
       </div>
     </div>
 
-    <div class="grid-2">
-      <div class="form-group">
-        <label>Catchiness (1-10)</label>
-        <input type="number" id="inCatch" value="8.0" step="0.1" min="1" max="10" oninput="calculate()" />
+    <!-- 2. Lyric Line Breakdown -->
+    <div class="panel">
+      <h2>1. Lyric Line Breakdown</h2>
+      <label style="font-size:0.8rem; color:var(--text-muted);">Paste verse or lyrics block here:</label>
+      <textarea id="lyricPasteBox" placeholder="Paste lyrics block..."></textarea>
+      <table>
+        <thead>
+          <tr>
+            <th>Lyric Line</th>
+            <th style="width: 120px;">Rating (1-10)</th>
+            <th style="width: 40px;"></th>
+          </tr>
+        </thead>
+        <tbody id="lyricsTbody">
+          <tr><td><input type="text" value="Midnight, you come and pick me up, no headlights" /></td><td><input type="number" class="lyric-rating" value="8" min="1" max="10" step="0.1" /></td><td><button class="btn-danger" onclick="deleteRow(this)">✕</button></td></tr>
+          <tr><td><input type="text" value="Long drive, could end in burning flames or paradise" /></td><td><input type="number" class="lyric-rating" value="8" min="1" max="10" step="0.1" /></td><td><button class="btn-danger" onclick="deleteRow(this)">✕</button></td></tr>
+          <tr><td><input type="text" value="You got that James Dean daydream look in your eye" /></td><td><input type="number" class="lyric-rating" value="10" min="1" max="10" step="0.1" /></td><td><button class="btn-danger" onclick="deleteRow(this)">✕</button></td></tr>
+        </tbody>
+      </table>
+      <div><button class="btn" onclick="addLyricRow()">+ Add Line</button></div>
+    </div>
+
+    <!-- 3. Production Breakdown -->
+    <div class="panel">
+      <h2>2. Production Breakdown</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Element</th>
+            <th style="width: 120px;">Rating (1-10)</th>
+            <th style="width: 40px;"></th>
+          </tr>
+        </thead>
+        <tbody id="prodTbody">
+          <tr><td><input type="text" value="Sound Design" /></td><td><input type="number" class="prod-rating" value="10" step="0.1" /></td><td><button class="btn-danger" onclick="deleteRow(this)">✕</button></td></tr>
+          <tr><td><input type="text" value="Rhythm & Groove" /></td><td><input type="number" class="prod-rating" value="10" step="0.1" /></td><td><button class="btn-danger" onclick="deleteRow(this)">✕</button></td></tr>
+          <tr><td><input type="text" value="Vocal Production" /></td><td><input type="number" class="prod-rating" value="7" step="0.1" /></td><td><button class="btn-danger" onclick="deleteRow(this)">✕</button></td></tr>
+        </tbody>
+      </table>
+      <div><button class="btn" onclick="addRow('prodTbody', 'prod-rating')">+ Add Element</button></div>
+    </div>
+
+    <!-- 4. Melody Breakdown -->
+    <div class="panel">
+      <h2>3. Melody Breakdown</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Criterion</th>
+            <th style="width: 120px;">Rating (1-10)</th>
+            <th style="width: 40px;"></th>
+          </tr>
+        </thead>
+        <tbody id="melodyTbody">
+          <tr><td><input type="text" value="Pitch Contour & Shape" /></td><td><input type="number" class="melody-rating" value="6" step="0.1" /></td><td><button class="btn-danger" onclick="deleteRow(this)">✕</button></td></tr>
+          <tr><td><input type="text" value="Hookiness & Memorability" /></td><td><input type="number" class="melody-rating" value="10" step="0.1" /></td><td><button class="btn-danger" onclick="deleteRow(this)">✕</button></td></tr>
+        </tbody>
+      </table>
+      <div><button class="btn" onclick="addRow('melodyTbody', 'melody-rating')">+ Add Criterion</button></div>
+    </div>
+
+    <!-- 5. Weights & Direct Ratings -->
+    <div class="panel">
+      <h2>Weights & Direct Subcategories</h2>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Catchiness (1-10)</label>
+          <input type="number" id="inCatch" value="8.0" step="0.1" oninput="calculateAll()" />
+        </div>
+        <div class="form-group">
+          <label>Sentimental Value (1-10)</label>
+          <input type="number" id="inSent" value="8.0" step="0.1" oninput="calculateAll()" />
+        </div>
       </div>
-      <div class="form-group">
-        <label>Sentimental (1-10)</label>
-        <input type="number" id="inSent" value="8.0" step="0.1" min="1" max="10" oninput="calculate()" />
+      <div class="grid-3">
+        <div class="form-group"><label>Lyrics Weight (%)</label><input type="number" id="wLyrics" value="40" oninput="calculateAll()" /></div>
+        <div class="form-group"><label>Prod Weight (%)</label><input type="number" id="wProd" value="37.5" oninput="calculateAll()" /></div>
+        <div class="form-group"><label>Melody Weight (%)</label><input type="number" id="wMelody" value="15" oninput="calculateAll()" /></div>
+        <div class="form-group"><label>Catch Weight (%)</label><input type="number" id="wCatch" value="5" oninput="calculateAll()" /></div>
+        <div class="form-group"><label>Sent Weight (%)</label><input type="number" id="wSent" value="2.5" oninput="calculateAll()" /></div>
       </div>
     </div>
 
-    <div class="btn-row">
-      <button class="btn btn-export" onclick="exportCard()">📸 Export Image (PNG)</button>
-    </div>
   </div>
 
-  <!-- Exportable Rating Card -->
-  <div class="card-preview" id="ratingCard">
-    <div class="card-header">
-      <img id="coverImg" class="album-cover" src="https://via.placeholder.com/150/131b2e/ffffff?text=Cover" crossorigin="anonymous" alt="Album Cover" />
-      <div class="song-meta">
-        <h2 class="song-title" id="outTitle">Style</h2>
-        <p class="artist-name" id="outArtist">Taylor Swift</p>
-        <p class="album-name" id="outAlbum">1989</p>
-      </div>
-    </div>
+  <!-- EXPORTABLE CARD PREVIEW -->
+  <div class="card-preview-wrapper">
+    <button class="btn btn-export" onclick="exportCard()">📸 Export Rating Card Image (PNG)</button>
 
-    <div class="ranking-box">
-      <div class="ranking-label">Overall Song Ranking</div>
-      <div class="ranking-score" id="outTotal">8.77</div>
-    </div>
+    <div class="card-preview" id="ratingCard">
+      <div class="card-header">
+        <img id="coverImg" class="album-cover" src="https://via.placeholder.com/150/131b2e/ffffff?text=Cover" crossorigin="anonymous" alt="Album Cover" />
+        <div class="song-meta">
+          <h3 class="song-title" id="outTitle">Style</h3>
+          <p class="artist-name" id="outArtist">Taylor Swift</p>
+          <p class="album-name" id="outAlbum">1989</p>
+        </div>
+      </div>
 
-    <div class="subcategories-list">
-      <div class="sub-item">
-        <span class="sub-name">Lyrics</span>
-        <span class="sub-value" id="outLyrics">8.7</span>
+      <div class="ranking-box">
+        <div class="ranking-label">Overall Song Score</div>
+        <div class="ranking-score" id="outTotal">8.77</div>
       </div>
-      <div class="sub-item">
-        <span class="sub-name">Production</span>
-        <span class="sub-value" id="outProd">9.4</span>
-      </div>
-      <div class="sub-item">
-        <span class="sub-name">Melody</span>
-        <span class="sub-value" id="outMelody">7.8</span>
-      </div>
-      <div class="sub-item">
-        <span class="sub-name">Catchiness</span>
-        <span class="sub-value" id="outCatch">8.0</span>
-      </div>
-      <div class="sub-item">
-        <span class="sub-name">Sentimental Value</span>
-        <span class="sub-value" id="outSent">8.0</span>
+
+      <div class="subcategories-list">
+        <div class="sub-item"><span class="sub-name">Lyrics</span><span class="sub-value" id="outLyrics">8.67</span></div>
+        <div class="sub-item"><span class="sub-name">Production</span><span class="sub-value" id="outProd">9.00</span></div>
+        <div class="sub-item"><span class="sub-name">Melody</span><span class="sub-value" id="outMelody">8.00</span></div>
+        <div class="sub-item"><span class="sub-name">Catchiness</span><span class="sub-value" id="outCatch">8.00</span></div>
+        <div class="sub-item"><span class="sub-name">Sentimental Value</span><span class="sub-value" id="outSent">8.00</span></div>
       </div>
     </div>
   </div>
@@ -330,55 +312,111 @@
       document.getElementById('outAlbum').innerText = document.getElementById('inAlbum').value || 'Album Name';
     }
 
-    function calculate() {
-      const lyrics = parseFloat(document.getElementById('inLyrics').value) || 0;
-      const prod = parseFloat(document.getElementById('inProd').value) || 0;
-      const melody = parseFloat(document.getElementById('inMelody').value) || 0;
+    function calcAvg(className) {
+      const inputs = document.querySelectorAll(`.${className}`);
+      let sum = 0, count = 0;
+      inputs.forEach(i => {
+        const v = parseFloat(i.value);
+        if (!isNaN(v)) { sum += v; count++; }
+      });
+      return count > 0 ? sum / count : 0;
+    }
+
+    function calculateAll() {
+      const avgLyrics = calcAvg('lyric-rating');
+      const avgProd = calcAvg('prod-rating');
+      const avgMelody = calcAvg('melody-rating');
+
       const catchiness = parseFloat(document.getElementById('inCatch').value) || 0;
       const sent = parseFloat(document.getElementById('inSent').value) || 0;
 
-      document.getElementById('outLyrics').innerText = lyrics.toFixed(1);
-      document.getElementById('outProd').innerText = prod.toFixed(1);
-      document.getElementById('outMelody').innerText = melody.toFixed(1);
-      document.getElementById('outCatch').innerText = catchiness.toFixed(1);
-      document.getElementById('outSent').innerText = sent.toFixed(1);
+      document.getElementById('outLyrics').innerText = avgLyrics.toFixed(2);
+      document.getElementById('outProd').innerText = avgProd.toFixed(2);
+      document.getElementById('outMelody').innerText = avgMelody.toFixed(2);
+      document.getElementById('outCatch').innerText = catchiness.toFixed(2);
+      document.getElementById('outSent').innerText = sent.toFixed(2);
 
-      // Default Weight Calculation matching formula specs
-      const total = (lyrics * 0.40) + (prod * 0.375) + (melody * 0.15) + (catchiness * 0.05) + (sent * 0.025);
+      const wLyrics = (parseFloat(document.getElementById('wLyrics').value) || 0) / 100;
+      const wProd = (parseFloat(document.getElementById('wProd').value) || 0) / 100;
+      const wMelody = (parseFloat(document.getElementById('wMelody').value) || 0) / 100;
+      const wCatch = (parseFloat(document.getElementById('wCatch').value) || 0) / 100;
+      const wSent = (parseFloat(document.getElementById('wSent').value) || 0) / 100;
+
+      const total = (avgLyrics * wLyrics) + (avgProd * wProd) + (avgMelody * wMelody) + (catchiness * wCatch) + (sent * wSent);
       document.getElementById('outTotal').innerText = total.toFixed(2);
     }
 
-    // Automatically fetch album art from iTunes Search API (no API key required)
+    document.getElementById('lyricPasteBox').addEventListener('input', function(e) {
+      const text = e.target.value.trim();
+      if (!text) return;
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const tbody = document.getElementById('lyricsTbody');
+      tbody.innerHTML = '';
+      lines.forEach(line => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input type="text" value="${line.replace(/"/g, '&quot;')}" /></td>
+          <td><input type="number" class="lyric-rating" value="8" min="1" max="10" step="0.1" /></td>
+          <td><button class="btn-danger" onclick="deleteRow(this)">✕</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+      attachListeners();
+      calculateAll();
+    });
+
+    function addLyricRow() {
+      const tbody = document.getElementById('lyricsTbody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td><input type="text" placeholder="Lyric line..." /></td><td><input type="number" class="lyric-rating" value="8" step="0.1" /></td><td><button class="btn-danger" onclick="deleteRow(this)">✕</button></td>`;
+      tbody.appendChild(tr);
+      attachListeners();
+      calculateAll();
+    }
+
+    function addRow(tbodyId, ratingClass) {
+      const tbody = document.getElementById(tbodyId);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td><input type="text" value="New Item" /></td><td><input type="number" class="${ratingClass}" value="8" step="0.1" /></td><td><button class="btn-danger" onclick="deleteRow(this)">✕</button></td>`;
+      tbody.appendChild(tr);
+      attachListeners();
+      calculateAll();
+    }
+
+    function deleteRow(btn) {
+      btn.closest('tr').remove();
+      calculateAll();
+    }
+
     function fetchCover() {
       const artist = document.getElementById('inArtist').value;
       const song = document.getElementById('inTitle').value;
       if (!artist || !song) return;
 
-      const query = encodeURIComponent(`${artist} ${song}`);
-      fetch(`https://itunes.apple.com/search?term=${query}&entity=song&limit=1`)
+      fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(artist + ' ' + song)}&entity=song&limit=1`)
         .then(res => res.json())
         .then(data => {
           if (data.results && data.results.length > 0) {
-            // Replace 100x100 resolution with 600x600 for high quality
             const highResUrl = data.results[0].artworkUrl100.replace('100x100bb', '600x600bb');
             document.getElementById('coverImg').src = highResUrl;
-            
-            // Auto update album name if blank
             if (!document.getElementById('inAlbum').value) {
               document.getElementById('inAlbum').value = data.results[0].collectionName;
               updateCard();
             }
-          } else {
-            alert('Cover art not found. Try refining artist/song name.');
           }
-        })
-        .catch(err => console.error('Error fetching cover:', err));
+        });
+    }
+
+    function attachListeners() {
+      document.querySelectorAll('input').forEach(i => {
+        i.removeEventListener('input', calculateAll);
+        i.addEventListener('input', calculateAll);
+      });
     }
 
     function exportCard() {
       const card = document.getElementById('ratingCard');
       const songTitle = document.getElementById('inTitle').value || 'Song_Rating';
-
       html2canvas(card, {
         backgroundColor: '#090d16',
         useCORS: true,
@@ -391,9 +429,9 @@
       });
     }
 
-    // Initial setup
     updateCard();
-    calculate();
+    attachListeners();
+    calculateAll();
     fetchCover();
   </script>
 </body>
